@@ -10,10 +10,12 @@ _Or_
 - To run test: ts-node Project.ts
 
 # NL
-Het selecteren van properties zoals 'name', 'lastname' dient type-safe te zijn. (in VScode control + . ) vult deze waarden automatisch aan.
+Het selecteren van properties zoals `'Name'`, `'Surname'` dient type-safe te zijn. (in VScode: Cntrl + . ) vult deze waarden automatisch aan als suggestie.
+
 Wanneer 1 van deze properties wordt geselecteerd verdwijnt de mogelijkheid om deze een tweede keer te selecteren (bv.  .select("name", "name") dient niet te mogen.)
-Zelfde geld voor de include functie, je zou de tabel moeten kunnen selecteren. Ook hier dienen de properties van de tabel maximaal 1x geselecteerd te worden.
-Verder moeten de functies chainable zijn. Voorbeeld:
+Zelfde geld voor de include functie, je zou de tabel `(Grades)` moeten kunnen selecteren. Ook hier dienen de properties van de tabel maximaal 1x geselecteerd te worden.
+
+Verder moeten de functies chainable zijn. Voorbeeld hiervan:
 
 ```typescript
 students.Select("Name").Select("Surname").Include("Grades", q =>
