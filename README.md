@@ -1,14 +1,25 @@
 # How to run
 
 _Install ts-node_
-npm install -D ts-node
 
-_Or_ 
-npm install -g ts-node
-(npm install -g typescript)
+- npm install -D ts-node
 
-To test: ts-node Project.ts
+_Or_
 
+- npm install -g ts-node
+- To run test: ts-node Project.ts
+
+# NL
+Het selecteren van properties zoals 'name', 'lastname' dient type-safe te zijn. (in VScode control + . ) vult deze waarden automatisch aan.
+Wanneer 1 van deze properties wordt geselecteerd verdwijnt de mogelijkheid om deze een tweede keer te selecteren (bv.  .select("name", "name") dient niet te mogen.)
+Zelfde geld voor de include functie, je zou de tabel moeten kunnen selecteren. Ook hier dienen de properties van de tabel maximaal 1x geselecteerd te worden.
+Verder moeten de functies chainable zijn. Voorbeeld:
+
+```typescript
+students.Select("Name").Select("Surname").Include("Grades", q =>
+  q.Select("Grade").Select("CourseId")
+)
+```
 
 # Type\-safe LINQ in memory
 
