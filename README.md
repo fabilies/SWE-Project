@@ -1,13 +1,13 @@
 # How to run
 
-_Install ts-node_
+_Npm_
 
-- npm install -D ts-node
+- npm install
 
-_Or_
+_To run_
 
-- npm install -g ts-node
-- To run test: ts-node Project.ts
+- npm run build
+- npm run start
 
 # NL
 Het selecteren van properties zoals `'Name'`, `'Surname'` dient type-safe te zijn. (in VScode: Cntrl + . ) vult deze waarden automatisch aan als suggestie.

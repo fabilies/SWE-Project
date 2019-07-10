@@ -9,9 +9,9 @@ export type Data<T, U> = Pair<List<T>, List<U>> // Track unmodified list in T (a
 
 export type ListType<T> = T extends List<infer U> ? U : never // Infer value of the type T
 
-export type Filter<T, Condition> = { // Set all types that match the Condition to the value of the field (i.e. name: "name")
+export type Filter<T, Condition> = {
     [key in keyof T]: T[key] extends Condition ? key : never 
-} [keyof T] // Selects all the types of all the keys except for never
+} [keyof T]
 
 
 interface Selectable<T, U> {
@@ -97,7 +97,7 @@ let initialSelectable = <T>(studentData: Data<T, Unit>): initialSelectable<T> =>
     }
 })
 
-// Factory method to create a Selectable
+// Append list of students to Selectable
 export const createSelectable = <T>(list: List<T>): initialSelectable<T> => {
     return initialSelectable(Pair(list, createList(list.count())))
 }
