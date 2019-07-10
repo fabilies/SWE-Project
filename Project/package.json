@@ -1,0 +1,16 @@
+{
+  "name": "type-safe-linq",
+  "version": "1.0.0",
+  "description": "Minor Software Engineering Year 3",
+  "main": "index.js",
+  "scripts": {
+    "start": "node build/index.js",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "0928899@hr.nl",
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "^3.4.3"
+  }
+}
