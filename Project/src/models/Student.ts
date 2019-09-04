@@ -5,7 +5,7 @@ export interface Student {
     name: string
     lastname: string
     age: number
-    gender: "male" | "female",
+    gender: "man" | "woman",
     city: string
     Grades: List<Grade> 
 }
@@ -14,10 +14,10 @@ export let Student = (
     name: string,
     lastname: string,
     age: number,
-    gender: "male" | "female",
+    gender: "man" | "woman",
     city: string,
-    grades: List<Grade>)
-    : Student => ({
+    grades: List<Grade>
+    ) : Student => ({
         name: name,
         lastname: lastname,
         age: age,

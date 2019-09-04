@@ -1,13 +1,13 @@
-import { List, Empty, mergeListTypes, createList, Cons } from "../global/ListOps";
+import { List, mergeListTypes, createList } from "../global/ListOps";
 import { Pair } from "../global/Pair";
 import { Omit, omitMany, omitOne } from "../global/Omit";
 import { pickMany, pickOne } from "../global/Pick";
-import { Unit } from "../global/Func"
-import { FilterBuilder, FilterCondition } from "./Where";
+
+type Unit = {}
 
 export type Data<T, U> = Pair<List<T>, List<U>> // Track unmodified list in T (all properties) and picked list in U (exclude picked properties)
 
-export type ListType<T> = T extends List<infer U> ? U : never // Infer value of the type T
+export type ListType<T> = T extends List<infer U> ? U : never // Infer value of the type T (overerven)
 
 export type Filter<T, Condition> = {
     [key in keyof T]: T[key] extends Condition ? key : never 
@@ -16,14 +16,14 @@ export type Filter<T, Condition> = {
 
 interface Selectable<T, U> {
     studentData: Data<T, U>
-    Select: <key extends keyof T>(this: Selectable<T, U>, ...properties: key[]) => Selectable<Omit<T, key>, U & Pick<T, key>>
-    Include: <key extends Filter<T, List<any>>, P extends keyof ListType<T[key]>>(
+    Select: <key extends keyof T>(this: Selectable<T, U>, ...properties: key[]) => Selectable<Omit<T, key>, U & Pick<T, key>> // Returns picked properties from T en removed key while Pick does the opposite
+    Include: <key extends Filter<T, List<any>>, P extends keyof ListType<T[key]>>
+    (
         record: key,
-        q: (_: initialSelectable<ListType<T[key]>>) => Selectable<Omit<ListType<T[key]>, P>, Pick<ListType<T[key]>, P>>
+        a: (_: initialSelectable<ListType<T[key]>>) => Selectable<Omit<ListType<T[key]>, P>, Pick<ListType<T[key]>, P>> // Overgebleven properties zitten in P
     ) =>
         Selectable<Omit<T, key>, U & { [k in key]: Array<Pick<ListType<T[key]>, P>> }>
 
-    Where: (filter: (_: FilterBuilder<T & U>) => FilterCondition<T & U>) => Selectable<T, U>
     toList: (this: Selectable<T, U>) => List<U>
 }
 
@@ -37,7 +37,6 @@ let Selectable = <T, U>(studentData: Data<T, U>): Selectable<T, U> => ({
         //     if(i >= ks.length) {
         //         return
         //     }
-
         //     let key = ks[i]
         //     ret[key] = (_entity[key])
         //     select_rec(_entity, ks, i + 1)
@@ -52,28 +51,14 @@ let Selectable = <T, U>(studentData: Data<T, U>): Selectable<T, U> => ({
     },
     Include: function <key extends Filter<T, List<any>>, P extends keyof ListType<T[key]>>(
         record: key,
-        q: (_: initialSelectable<ListType<T[key]>>) => Selectable<Omit<ListType<T[key]>, P>, Pick<ListType<T[key]>, P>>
+        q: (_: initialSelectable<ListType<T[key]>>) => Selectable<Omit<ListType<T[key]>, P>, Pick<ListType<T[key]>, P>> // remove p from grades
     ):
-        Selectable<Omit<T, key>, U & { [k in key]: Array<Pick<ListType<T[key]>, P>> }> {
+        Selectable<Omit<T, key>, U & { [k in key]: Array<Pick<ListType<T[key]>, P>> }> { // wat je overhoud
         return Selectable(this.studentData.map(
             first => first.map(entry => omitOne(entry, record)),
             second => mergeListTypes(second.merge(this.studentData.fst.map(entry =>
-                ({ [record]: q(createSelectable(entry[record] as any)).toList().reverse().toArray() })))) as any   
+                ({ [record]: q(createSelectable(entry[record] as any)).toList().toArray() })))) as any
         ))
-    },
-    Where: function (filter: (_: FilterBuilder<T & U>) => FilterCondition<T & U>): Selectable<T, U> {
-        let temp_fst = this.studentData.fst
-        let temp_snd = this.studentData.snd
-        let result = Empty<U>()
-        while (temp_fst.kind != 'empty' && temp_snd.kind != 'empty') {
-            if (filter(FilterBuilder({ ...temp_fst.head, ...temp_snd.head })).condition) {
-                result = Cons(temp_snd.head, result)
-            }
-            temp_fst = temp_fst.tail
-            temp_snd = temp_snd.tail
-        }
-        return Selectable(Pair(this.studentData.fst, result.reverse()))
-
     },
     toList: function (this: Selectable<T, U>): List<U> {
         return this.studentData.snd

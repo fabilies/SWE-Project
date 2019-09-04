@@ -1,7 +1,8 @@
 import { Pair } from "./Pair";
-import { Func, Unit } from "./Func";
 
 export type List<T> = ListType<T> & ListOperations<T>
+
+type Unit = {}
 
 type ListType<T> = {
     kind: "empty"
@@ -11,45 +12,32 @@ type ListType<T> = {
     tail: List<T>
 }
 
+// To apply on student list
 type ListOperations<T> = {
-    reduce: <U>(this: List<T>, f: (state: U, x: T) => U, accumulator: U) => U
     map: <U>(this: List<T>, f: (_: T) => U) => List<U>
-    reverse: (this: List<T>) => List<T>
+    reduce: <U>(this: List<T>, f: (state: U, x: T) => U, accumulator: U) => U    
     concat: (this: List<T>, l: List<T>) => List<T>
     toArray: (this: List<T>) => T[]
     count: (this: List<T>) => number
-    filter: (this: List<T>, predicate: Func<T, boolean>) => List<T>
     merge: <U>(this: List<T>, list: List<U>) => List<Pair<T, U>>
 }
 
 let ListOperations = <T>(): ListOperations<T> => ({
-    reduce: function <U>(this: List<T>, f: (state: U, x: T) => U, accumulator: U): U {
-        return this.kind == "empty" ? accumulator : this.tail.reduce(f, f(accumulator, this.head))
-    },
     map: function <U>(this: List<T>, f: (_: T) => U): List<U> {
-        return this.reduce<List<U>>((s, x) => Cons(f(x), s), Empty<U>()).reverse()
+        return this.reduce<List<U>>((s, x) => Cons(f(x), s), Empty<U>())
     },
-    reverse: function (this: List<T>): List<T> {
-        return this.reduce((s, x) => Cons(x, s), Empty())
+    reduce: function <U>(this: List<T>, f: (state: U, x: T) => U, accumulator: U): U {
+        return this.kind == "empty" ? accumulator : this.tail.reduce(f, f(accumulator, this.head)) // Return value of the function is stored in an accumulator
     },
     concat: function (this: List<T>, l: List<T>): List<T> {
-        return this.reverse().reduce((s, x) => Cons(x, s), l)
+        return this.reduce((s, x) => Cons(x, s), l)
     },
     toArray: function (this: List<T>): T[] {
         return this.reduce<T[]>((s, x) => s.concat([x]), [])
     },
     count: function (this: List<T>): number {
-        return this.reduce((s, x) => s + 1, 0)
+        return this.reduce((s) => s + 1, 0)
     }, 
-    filter: function (this: List<T>, predicate: Func<T, boolean>): List<T> {
-        return this.reduce((s, x) => {
-            if (predicate.f(x)) {
-                return Cons(x, s)
-            } else {
-                return s
-            }
-        }, Empty())
-    },
     merge: function <U>(this: List<T>, list: List<U>): List<Pair<T, U>> {
         if (this.count() != list.count()) {
             throw "Not equal in length"
@@ -64,14 +52,14 @@ let ListOperations = <T>(): ListOperations<T> => ({
 
 })
 
-export let Cons = <T>(head: T, tail: List<T>): List<T> => ({
+let Cons = <T>(head: T, tail: List<T>): List<T> => ({
     kind: "cons",
     head: head,
     tail: tail,
     ...ListOperations()
 })
 
-export let Empty = <T>(): List<T> => ({
+let Empty = <T>(): List<T> => ({
     kind: "empty",
     ...ListOperations()
 })
@@ -88,14 +76,13 @@ export let createList = (n: number): List<Unit> => {
         return Empty()
     }
     else {
-        return Cons({}, createList(n - 1))
+        return Cons( {}, createList(n - 1) )
     }
 }
 
 // list[] to List<T>
-export let FromArrayToList = <T>(array: T[]): List<T> => {
+export let FromArrayToList = <T>(array: T[]): List<T> => { 
+    // console.log(array.reduce((s, x) => Cons(x, s) , Empty<T>()));
+    // console.log('\n');
     return array.reduce((s, x) => Cons(x, s) , Empty<T>())
 }
-
-
-

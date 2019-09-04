@@ -8,7 +8,7 @@ export let omitOne = <T, key extends keyof T>(entity: T, prop: key): Omit<T, key
 export let omitMany = <T, key extends keyof T>(entity: T, props: key[]): Omit<T, key> => {
     let result = entity as Omit<T, key>
     props.map(prop => {
-        result = omitOne(result, prop as unknown as keyof Omit<T, key>) as Omit<T, key>
+        result = omitOne(entity, prop as key)
     })
     return result
 }

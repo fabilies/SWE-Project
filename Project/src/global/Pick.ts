@@ -1,5 +1,5 @@
-export let pickOne = <T, key extends keyof T>(entity: T, props: key): Pick<T, key> => {
-    return { [props] : entity[props] } as Pick<T, key>
+export let pickOne = <T, key extends keyof T>(entity: T, prop: key): Pick<T, key> => {
+    return { [prop] : entity[prop] } as Pick<T, key>
 }
 
 // Pick multiple properties
